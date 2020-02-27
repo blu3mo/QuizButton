@@ -146,7 +146,11 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
         }))
         
         actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        actionSheet.popoverPresentationController?.sourceView = self.view
         
+        let screenSize = UIScreen.main.bounds
+        actionSheet.popoverPresentationController?.sourceRect = CGRect(x: screenSize.size.width/2, y: screenSize.size.height/2, width: 0, height: 0)
+        actionSheet.popoverPresentationController?.permittedArrowDirections = []
         self.present(actionSheet, animated: true, completion: nil)
     }
     
