@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		368CF9F122677B5C009D4947 /* quizsound.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 368CF9F0226779E8009D4947 /* quizsound.m4a */; };
 		36CF3DA52265E167001DB43D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36CF3DA42265E167001DB43D /* AppDelegate.swift */; };
 		36CF3DA72265E167001DB43D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36CF3DA62265E167001DB43D /* ViewController.swift */; };
 		36CF3DAA2265E167001DB43D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 36CF3DA82265E167001DB43D /* Main.storyboard */; };
@@ -34,6 +35,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		368CF9F0226779E8009D4947 /* quizsound.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = quizsound.m4a; sourceTree = "<group>"; };
 		36CF3DA12265E167001DB43D /* QuizButton.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QuizButton.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		36CF3DA42265E167001DB43D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		36CF3DA62265E167001DB43D /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -103,6 +105,7 @@
 				36CF3DAB2265E169001DB43D /* Assets.xcassets */,
 				36CF3DAD2265E169001DB43D /* LaunchScreen.storyboard */,
 				36CF3DB02265E169001DB43D /* Info.plist */,
+				368CF9F0226779E8009D4947 /* quizsound.m4a */,
 			);
 			path = QuizButton;
 			sourceTree = "<group>";
@@ -229,6 +232,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				368CF9F122677B5C009D4947 /* quizsound.m4a in Resources */,
 				36CF3DAF2265E169001DB43D /* LaunchScreen.storyboard in Resources */,
 				36CF3DAC2265E169001DB43D /* Assets.xcassets in Resources */,
 				36CF3DAA2265E167001DB43D /* Main.storyboard in Resources */,
@@ -433,12 +437,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 2SU5299JX4;
 				INFOPLIST_FILE = QuizButton/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = jp.bluemountain.droneapp1.QuizButton;
+				PRODUCT_BUNDLE_IDENTIFIER = jp.bluemountain22.droneapp1.QuizButton12;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -450,12 +455,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 2SU5299JX4;
 				INFOPLIST_FILE = QuizButton/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = jp.bluemountain.droneapp1.QuizButton;
+				PRODUCT_BUNDLE_IDENTIFIER = jp.bluemountain22.droneapp1.QuizButton12;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
