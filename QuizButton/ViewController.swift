@@ -29,18 +29,27 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
     var state = State.open
     enum State {
         case open
-        case waitingResult
+        case judging
         case done
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         // Do any additional setup after loading the view, typically from a nib.
         
         // Initial Multipeer Conectivity setup
         peerId = MCPeerID(displayName: UIDevice.current.name)
         mcSession = MCSession(peer: peerId, securityIdentity: nil, encryptionPreference: .required)
         mcSession.delegate = self
+        
+        //Sound setup
+        var fileURL = Bundle.main.path(forResource: "quizsound", ofType: "m4a")!
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: fileURL))
+        } catch  {
+            print("error on audio")
+        }
     }
     
     
@@ -88,83 +97,55 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
     
     // Sending Data
     @IBAction func answerButtonTapped(_ sender: Any) {
+        playSound()
         sendTime()
     }
     
     func sendTime() {
+        if mcSession.connectedPeers.count <= 0 { return }
+        
         if state == .open {
             selfTime = Date()
-            if self.state == .waitingResult { //すでに相手は押している
-                if opponentTime < selfTime {
-                    DispatchQueue.main.async { self.view.backgroundColor = .blue }
-                } else {
-                    DispatchQueue.main.async { self.view.backgroundColor = .red }
-                    
-                    var fileURL = Bundle.main.path(forResource: "quizsound", ofType: "m4a")!
-                    audioPlayer = try! AVAudioPlayer(contentsOf: URL(fileURLWithPath: fileURL))
-                    audioPlayer?.play()
-                    let generator = UINotificationFeedbackGenerator()
-                    DispatchQueue.main.async { generator.notificationOccurred(.success) }
-                }
-                state = .done
-            }
-            print("send")
-            state = .waitingResult
-            if mcSession.connectedPeers.count > 0 {
-                let timeString = stringFromDate(date: Date(), format: "y-MM-dd H:m:ss.SSSS")
-                print(timeString)
-                print(dateFromString(string: timeString, format: "y-MM-dd H:m:ss.SSSS"))
-                do {
-                    try mcSession.send(timeString.data(using: .utf8)!, toPeers: mcSession.connectedPeers, with: .reliable)
-                } catch {
-                   print("hoo")
-                }
-            }  else {
-                print("oops2")
+            state = .judging
+            //if self.state != .judging { //すでに相手は押している
+            let timeString = stringFromDate(date: Date(), format: "y-MM-dd H:m:ss.SSSS")
+            do {
+                try mcSession.send(timeString.data(using: .utf8)!, toPeers: mcSession.connectedPeers, with: .reliable)
+            } catch {
+                print("hoo")
             }
         }
+        
     }
     
     
     // Recieving Data
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        do {
-            let decodedData = String(data: data, encoding: .utf8)
-            if decodedData == "youwin" {
+        let decodedData = String(data: data, encoding: .utf8)
+        if decodedData == "youwin" {
+            if state != .done {
                 state = .done
                 DispatchQueue.main.async { self.view.backgroundColor = .red }
-                var fileURL = Bundle.main.path(forResource: "quizsound", ofType: "m4a")!
-                audioPlayer = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: fileURL))
-                audioPlayer?.play()
-                let generator = UINotificationFeedbackGenerator()
-                DispatchQueue.main.async { generator.notificationOccurred(.success) }
-                return
             }
-            if self.state == .waitingResult { //すでに自分は押している
-                opponentTime = dateFromString(string: decodedData!, format: "y-MM-dd H:m:ss.SSSS")
+            return
+        } else if state == .judging { //すでに自分は押している
+            opponentTime = dateFromString(string: decodedData!, format: "y-MM-dd H:m:ss.SSSS")
+            print(opponentTime)
+            print(selfTime)
+            if opponentTime < selfTime {
+                DispatchQueue.main.async { self.view.backgroundColor = .black }
                 state = .done
-                
-                if opponentTime < selfTime {
-                    DispatchQueue.main.async { self.view.backgroundColor = .blue }
-                } else {
-                    DispatchQueue.main.async { self.view.backgroundColor = .red }
-                    var fileURL = Bundle.main.path(forResource: "quizsound", ofType: "m4a")!
-                    audioPlayer = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: fileURL))
-                    audioPlayer?.play()
-                    let generator = UINotificationFeedbackGenerator()
-                    DispatchQueue.main.async { generator.notificationOccurred(.success) }
-                }
             } else {
+                DispatchQueue.main.async { self.view.backgroundColor = .red }
                 state = .done
-                DispatchQueue.main.async { self.view.backgroundColor = .blue }
-                do {
-                    try mcSession.send(("youwin").data(using: .utf8)!, toPeers: mcSession.connectedPeers, with: .reliable)
-                } catch {
-                    print("hoo")
-                }
             }
-        } catch {
-            print("oops")
+        } else if state == .open {
+            DispatchQueue.main.async { self.view.backgroundColor = .black }
+            state = .done
+            do {
+                try mcSession.send(("youwin").data(using: .utf8)!, toPeers: mcSession.connectedPeers, with: .reliable)
+            } catch { }
+            
         }
     }
     
@@ -214,6 +195,11 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
         countLabel.text = String(count)
     }
     
+    func playSound() {
+        audioPlayer?.currentTime = 0         // 再生箇所を頭に移す
+        audioPlayer?.play()
+    }
+    
     
     // Debug
     func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
@@ -224,6 +210,7 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
             print("connecting: \(peerID.displayName)")
         case .notConnected:
             print("not connected: \(peerID.displayName)")
+            //self.state = .open
         }
     }
     

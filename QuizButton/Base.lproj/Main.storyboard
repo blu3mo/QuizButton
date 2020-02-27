@@ -16,11 +16,11 @@
                         <rect key="frame" x="0.0" y="0.0" width="1112" height="834"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="ulr-d0-9sC">
-                                <rect key="frame" x="15" y="8" width="91" height="96"/>
+                            <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="ulr-d0-9sC">
+                                <rect key="frame" x="15" y="8" width="186" height="32"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SPR-EI-dC3">
-                                        <rect key="frame" x="0.0" y="0.0" width="91" height="32"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="93" height="32"/>
                                         <fontDescription key="fontDescription" name="Helvetica-BoldOblique" family="Helvetica" pointSize="17"/>
                                         <state key="normal" title="Connect">
                                             <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -29,21 +29,10 @@
                                             <action selector="ConnectButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ovT-uD-imy"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9n6-fw-npz">
-                                        <rect key="frame" x="0.0" y="32" width="91" height="32"/>
-                                        <fontDescription key="fontDescription" name="Helvetica-BoldOblique" family="Helvetica" pointSize="17"/>
-                                        <state key="normal" title="Answer">
-                                            <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="answerButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="K3S-Gk-7mS"/>
-                                            <action selector="resetTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="7ii-wo-Yhf"/>
-                                        </connections>
-                                    </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZQ0-aB-lMi">
-                                        <rect key="frame" x="0.0" y="64" width="91" height="32"/>
+                                        <rect key="frame" x="93" y="0.0" width="93" height="32"/>
                                         <fontDescription key="fontDescription" name="Helvetica-BoldOblique" family="Helvetica" pointSize="17"/>
-                                        <state key="normal" title="Reset state">
+                                        <state key="normal" title="Reset State">
                                             <color key="titleColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </state>
                                         <connections>
@@ -97,8 +86,8 @@
                                         <rect key="frame" x="46" y="0.0" width="964" height="600"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="8800" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="P5j-W0-ORq">
-                                                <rect key="frame" x="35.5" y="30" width="893" height="700"/>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="P5j-W0-ORq">
+                                                <rect key="frame" x="370.5" y="30" width="223.5" height="700"/>
                                                 <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="700" id="4ka-Up-Kcw"/>
@@ -162,6 +151,19 @@
                                 <rect key="frame" x="531" y="369" width="50" height="50"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </stackView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9n6-fw-npz">
+                                <rect key="frame" x="256" y="0.0" width="600" height="834"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="600" id="AEb-ql-JrW"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="Helvetica-BoldOblique" family="Helvetica" pointSize="17"/>
+                                <state key="normal">
+                                    <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="answerButtonTapped:" destination="BYZ-38-t0r" eventType="touchDown" id="heb-wv-ea1"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
                         <constraints>
@@ -169,7 +171,10 @@
                             <constraint firstItem="ulr-d0-9sC" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="15" id="NLC-hY-Msg"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="Omk-BB-PSF" secondAttribute="trailing" constant="25.5" id="PJ5-kh-W94"/>
                             <constraint firstItem="Omk-BB-PSF" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="Q4u-H3-kn7"/>
+                            <constraint firstItem="9n6-fw-npz" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Tm8-el-hO2"/>
+                            <constraint firstItem="9n6-fw-npz" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="bu5-3Y-eFa"/>
                             <constraint firstItem="Omk-BB-PSF" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="25.5" id="g1l-3O-ZDm"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="9n6-fw-npz" secondAttribute="bottom" id="xTk-zn-6Bg"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="top" secondItem="ulr-d0-9sC" secondAttribute="top" constant="-8" id="xry-Bi-Tdr"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
