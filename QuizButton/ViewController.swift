@@ -12,17 +12,10 @@ import AVFoundation
 
 class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControllerDelegate {
     
-    
-
-    @IBOutlet weak var button: UIButton!
-    @IBOutlet weak var resultText: UILabel!
-    @IBOutlet weak var diffText: UILabel!
-    
     @IBOutlet weak var countLabel: UILabel!
-    
-    var condition = Condition.clear
-    
-    var userTime = Date()
+        
+    let screenSize = UIScreen.main.bounds
+    var selfTime = Date()
     var opponentTime = Date()
     
     var count = 0
@@ -31,46 +24,114 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
     var mcSession: MCSession!
     var mcAdvertiserAssistant: MCAdvertiserAssistant!
     
-            var audioPlayer: AVAudioPlayer?
+    var audioPlayer: AVAudioPlayer?
     
-    override func viewDidLoad() {
-        condition = .clear
-        super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        setupConnectivity()
+    var state = State.open
+    enum State {
+        case open
+        case waitingResult
+        case done
     }
     
-    func setupConnectivity() {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view, typically from a nib.
+        
+        // Initial Multipeer Conectivity setup
         peerId = MCPeerID(displayName: UIDevice.current.name)
         mcSession = MCSession(peer: peerId, securityIdentity: nil, encryptionPreference: .required)
         mcSession.delegate = self
     }
     
-    func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
-        switch state {
-        case .connected:
-            print("connected: \(peerID.displayName)")
-        case .connecting:
-            print("connecting: \(peerID.displayName)")
-        case .notConnected:
-            print("not connected: \(peerID.displayName)")
+    
+    // Connecting with other devices
+    
+    @IBAction func ConnectButtonTapped(_ sender: Any) {
+        let actionSheet = UIAlertController(title: "Quiz Button", message: "Host or Join a session", preferredStyle: .actionSheet)
+        
+        actionSheet.addAction(UIAlertAction(title: "Host Session", style: .default, handler: { (action:UIAlertAction) in
+            self.advertise()
+        }))
+
+        actionSheet.addAction(UIAlertAction(title: "Join Session", style: .default, handler: { (action:UIAlertAction) in
+            self.presentBrowser()
+        }))
+        
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        actionSheet.popoverPresentationController?.sourceView = self.view
+        actionSheet.popoverPresentationController?.sourceRect = CGRect(x: screenSize.size.width/2, y: screenSize.size.height/2, width: 0, height: 0)
+        actionSheet.popoverPresentationController?.permittedArrowDirections = []
+        self.present(actionSheet, animated: true, completion: nil)
+    }
+    
+    func advertise() {
+        mcAdvertiserAssistant = MCAdvertiserAssistant(serviceType: "ba-td", discoveryInfo: nil, session: self.mcSession)
+        mcAdvertiserAssistant.start()
+    }
+    
+    func presentBrowser() {
+        let mcBrowser = MCBrowserViewController(serviceType: "ba-td", session: mcSession)
+        mcBrowser.delegate = self
+        mcBrowser.maximumNumberOfPeers = 1
+        mcBrowser.minimumNumberOfPeers = 1
+        present(mcBrowser, animated: true, completion: nil)
+    }
+    
+    func browserViewControllerDidFinish(_ browserViewController: MCBrowserViewController) {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func browserViewControllerWasCancelled(_ browserViewController: MCBrowserViewController) {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    
+    // Sending Data
+    @IBAction func answerButtonTapped(_ sender: Any) {
+        sendTime()
+    }
+    
+    func sendTime() {
+        if state == .open {
+            selfTime = Date()
+            if self.state == .waitingResult { //すでに相手は押している
+                if opponentTime < selfTime {
+                    DispatchQueue.main.async { self.view.backgroundColor = .blue }
+                } else {
+                    DispatchQueue.main.async { self.view.backgroundColor = .red }
+                    
+                    var fileURL = Bundle.main.path(forResource: "quizsound", ofType: "m4a")!
+                    audioPlayer = try! AVAudioPlayer(contentsOf: URL(fileURLWithPath: fileURL))
+                    audioPlayer?.play()
+                    let generator = UINotificationFeedbackGenerator()
+                    DispatchQueue.main.async { generator.notificationOccurred(.success) }
+                }
+                state = .done
+            }
+            print("send")
+            state = .waitingResult
+            if mcSession.connectedPeers.count > 0 {
+                let timeString = stringFromDate(date: Date(), format: "y-MM-dd H:m:ss.SSSS")
+                print(timeString)
+                print(dateFromString(string: timeString, format: "y-MM-dd H:m:ss.SSSS"))
+                do {
+                    try mcSession.send(timeString.data(using: .utf8)!, toPeers: mcSession.connectedPeers, with: .reliable)
+                } catch {
+                   print("hoo")
+                }
+            }  else {
+                print("oops2")
+            }
         }
     }
     
-    @IBAction func addCounter(_ sender: Any) {
-        count += 10
-        countLabel.text = String(count)
-    }
-    @IBAction func subtractCounter(_ sender: Any) {
-        count -= 10
-        countLabel.text = String(count)
-    }
+    
+    // Recieving Data
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         do {
-            let time = String(data: data, encoding: .utf8)//try JSONDecoder().decode(String.self, from: data)
-            if time == "youwon" {
-                DispatchQueue.main.async { self.resultText.text = "YOU WIN" }
-                condition = .done
+            let decodedData = String(data: data, encoding: .utf8)
+            if decodedData == "youwin" {
+                state = .done
                 DispatchQueue.main.async { self.view.backgroundColor = .red }
                 var fileURL = Bundle.main.path(forResource: "quizsound", ofType: "m4a")!
                 audioPlayer = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: fileURL))
@@ -79,22 +140,13 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
                 DispatchQueue.main.async { generator.notificationOccurred(.success) }
                 return
             }
-            if self.condition == .judging { //すでに自分は押している
-                opponentTime = dateFromString(string: time!, format: "y-MM-dd H:m:ss.SSSS")
-                print("my")
-                print(stringFromDate(date: userTime, format: "y-MM-dd H:m:ss.SSSS"))
-                print("oppo")
-                print(stringFromDate(date: opponentTime, format: "y-MM-dd H:m:ss.SSSS"))
-                condition = .done
-                let diff = Calendar.current.dateComponents([.second], from: opponentTime, to: userTime)
-                let nanodiff = Calendar.current.dateComponents([.nanosecond], from: opponentTime, to: userTime)
+            if self.state == .waitingResult { //すでに自分は押している
+                opponentTime = dateFromString(string: decodedData!, format: "y-MM-dd H:m:ss.SSSS")
+                state = .done
                 
-                DispatchQueue.main.async { self.diffText.text = String(fabs(Double(nanodiff.nanosecond!)/1000000000)) + "sec." }
-                if opponentTime < userTime {
-                    DispatchQueue.main.async { self.resultText.text = "YOU LOSE" }
+                if opponentTime < selfTime {
                     DispatchQueue.main.async { self.view.backgroundColor = .blue }
                 } else {
-                    DispatchQueue.main.async { self.resultText.text = "YOU WIN" }
                     DispatchQueue.main.async { self.view.backgroundColor = .red }
                     var fileURL = Bundle.main.path(forResource: "quizsound", ofType: "m4a")!
                     audioPlayer = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: fileURL))
@@ -103,17 +155,14 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
                     DispatchQueue.main.async { generator.notificationOccurred(.success) }
                 }
             } else {
-                DispatchQueue.main.async { self.resultText.text = "YOU LOSE" }
-                condition = .done
+                state = .done
                 DispatchQueue.main.async { self.view.backgroundColor = .blue }
                 do {
-                    try mcSession.send(("youwon").data(using: .utf8)!, toPeers: mcSession.connectedPeers, with: .reliable)
+                    try mcSession.send(("youwin").data(using: .utf8)!, toPeers: mcSession.connectedPeers, with: .reliable)
                 } catch {
                     print("hoo")
                 }
             }
-            print(time)
-            
         } catch {
             print("oops")
         }
@@ -130,88 +179,7 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
     func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
         
     }
-
-    @IBAction func ConnectButtonTapped(_ sender: Any) {
-        let actionSheet = UIAlertController(title: "ToDo Exchange", message: "Do you want to Host or Join a session?", preferredStyle: .actionSheet)
-        
-        actionSheet.addAction(UIAlertAction(title: "Host Session", style: .default, handler: { (action:UIAlertAction) in
-            self.mcAdvertiserAssistant = MCAdvertiserAssistant(serviceType: "ba-td", discoveryInfo: nil, session: self.mcSession)
-            self.mcAdvertiserAssistant.start()
-        }))
-        
-        actionSheet.addAction(UIAlertAction(title: "Join Session", style: .default, handler: { (action:UIAlertAction) in
-            let mcBrowser = MCBrowserViewController(serviceType: "ba-td", session: self.mcSession)
-            mcBrowser.delegate = self
-            self.present(mcBrowser, animated: true, completion: nil)
-        }))
-        
-        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        actionSheet.popoverPresentationController?.sourceView = self.view
-        
-        let screenSize = UIScreen.main.bounds
-        actionSheet.popoverPresentationController?.sourceRect = CGRect(x: screenSize.size.width/2, y: screenSize.size.height/2, width: 0, height: 0)
-        actionSheet.popoverPresentationController?.permittedArrowDirections = []
-        self.present(actionSheet, animated: true, completion: nil)
-    }
     
-    func sendTime(_ time: Date) {
-        userTime = time
-        if self.condition == .judging { //すでに相手は押している
-            if opponentTime < userTime {
-                DispatchQueue.main.async { self.resultText.text = "YOU LOSE" }
-                DispatchQueue.main.async { self.view.backgroundColor = .blue }
-            } else {
-                DispatchQueue.main.async { self.resultText.text = "YOU WIN" }
-                DispatchQueue.main.async { self.view.backgroundColor = .red }
-                var fileURL = Bundle.main.path(forResource: "quizsound", ofType: "m4a")!
-                audioPlayer = try! AVAudioPlayer(contentsOf: URL(fileURLWithPath: fileURL))
-                audioPlayer?.play()
-                let generator = UINotificationFeedbackGenerator()
-                DispatchQueue.main.async { generator.notificationOccurred(.success) }
-            }
-            condition = .done
-            let diff = Calendar.current.dateComponents([.second], from: opponentTime, to: userTime)
-            let nanodiff = Calendar.current.dateComponents([.nanosecond], from: opponentTime, to: userTime)
-            
-            DispatchQueue.main.async { self.diffText.text = String(fabs(Double(nanodiff.nanosecond!)/1000000000)) + "sec." }
-        }
-        print("send")
-        condition = .judging
-        resultText.text = "Judging..."
-        if mcSession.connectedPeers.count > 0 {
-            let timeString = stringFromDate(date: time, format: "y-MM-dd H:m:ss.SSSS")
-            print(timeString)
-            print(dateFromString(string: timeString, format: "y-MM-dd H:m:ss.SSSS"))
-            do {
-                try mcSession.send(timeString.data(using: .utf8)!, toPeers: mcSession.connectedPeers, with: .reliable)
-            } catch {
-               print("hoo")
-            }
-        }  else {
-            print("oops2")
-        }
-    }
-    
-    @IBAction func buttonTapped(_ sender: Any) {
-        print("hi")
-        if condition == .clear {
-            sendTime(Date())
-        }
-    }
-    @IBAction func buttonTouchDowned(_ sender: Any) {
-        button.imageView?.image = UIImage(named: "button2")
-    }
-    @IBAction func buttonTouchUped(_ sender: Any) {
-        button.imageView?.image = UIImage(named: "button1")
-    }
-    
-    func browserViewControllerDidFinish(_ browserViewController: MCBrowserViewController) {
-        dismiss(animated: true, completion: nil)
-    }
-    
-    func browserViewControllerWasCancelled(_ browserViewController: MCBrowserViewController) {
-        dismiss(animated: true, completion: nil)
-    }
     
     func dateFromString(string: String, format: String) -> Date {
         let formatter: DateFormatter = DateFormatter()
@@ -228,18 +196,36 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
     }
     
     @IBAction func resetTapped(_ sender: Any) {
-        resultText.text = ""
-        diffText.text = ""
-        condition = .clear
+        state = .open
         view.backgroundColor = UIColor(red:0.12, green:0.13, blue:0.14, alpha:1.0)
-        userTime = Date()
+        selfTime = Date()
         opponentTime = Date()
     }
     
-    enum Condition {
-        case clear
-        case done
-        case judging
+    // Score Counter
+    
+    @IBAction func addCounter(_ sender: UIButton) {
+        count += sender.tag
+        countLabel.text = String(count)
     }
+    
+    @IBAction func subtractCounter(_ sender: UIButton) {
+        count -= sender.tag
+        countLabel.text = String(count)
+    }
+    
+    
+    // Debug
+    func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
+        switch state {
+        case .connected:
+            print("connected: \(peerID.displayName)")
+        case .connecting:
+            print("connecting: \(peerID.displayName)")
+        case .notConnected:
+            print("not connected: \(peerID.displayName)")
+        }
+    }
+    
 }
 
