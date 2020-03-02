@@ -133,14 +133,14 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
             print(opponentTime)
             print(selfTime)
             if opponentTime < selfTime {
-                DispatchQueue.main.async { self.view.backgroundColor = .black }
+                DispatchQueue.main.async { self.view.backgroundColor = .blue }
                 state = .done
             } else {
                 DispatchQueue.main.async { self.view.backgroundColor = .red }
                 state = .done
             }
         } else if state == .open {
-            DispatchQueue.main.async { self.view.backgroundColor = .black }
+            DispatchQueue.main.async { self.view.backgroundColor = .blue }
             state = .done
             do {
                 try mcSession.send(("youwin").data(using: .utf8)!, toPeers: mcSession.connectedPeers, with: .reliable)
