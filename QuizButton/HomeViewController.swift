@@ -10,7 +10,13 @@ import UIKit
 import MultipeerConnectivity
 import AVFoundation
 
-class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControllerDelegate {
+final class HomeViewController: UIViewController {
+    
+    private var presenter: HomePresenterProtocol!
+    
+    func inject(presenter: HomePresenterProtocol) {
+        self.presenter = presenter
+    }
     
     @IBOutlet weak var countLabel: UILabel!
         
@@ -27,10 +33,11 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
     var audioPlayer: AVAudioPlayer?
     
     var state = State.open
+    
     enum State {
         case open
         case judging
-        case done
+        case result
     }
     
     override func viewDidLoad() {
@@ -123,29 +130,35 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         let decodedData = String(data: data, encoding: .utf8)
         if decodedData == "youwin" {
-            if state != .done {
-                state = .done
+            if state != .result {
+                state = .result
                 DispatchQueue.main.async { self.view.backgroundColor = .red }
             }
             return
-        } else if state == .judging { //すでに自分は押している
-            opponentTime = dateFromString(string: decodedData!, format: "y-MM-dd H:m:ss.SSSS")
-            print(opponentTime)
-            print(selfTime)
-            if opponentTime < selfTime {
+        } else {
+            switch state {
+            case .judging:
+                opponentTime = dateFromString(string: decodedData!, format: "y-MM-dd H:m:ss.SSSS")
+                print(opponentTime)
+                print(selfTime)
+                if opponentTime < selfTime {
+                    DispatchQueue.main.async { self.view.backgroundColor = .blue }
+                    state = .result
+                } else {
+                    DispatchQueue.main.async { self.view.backgroundColor = .red }
+                    state = .result
+                }
+            case .open:
                 DispatchQueue.main.async { self.view.backgroundColor = .blue }
-                state = .done
-            } else {
-                DispatchQueue.main.async { self.view.backgroundColor = .red }
-                state = .done
+                state = .result
+                do {
+                    try mcSession.send(("youwin").data(using: .utf8)!, toPeers: mcSession.connectedPeers, with: .reliable)
+                } catch {
+                    print("Sending Error")
+                }
+            case .result:
+                break
             }
-        } else if state == .open {
-            DispatchQueue.main.async { self.view.backgroundColor = .blue }
-            state = .done
-            do {
-                try mcSession.send(("youwin").data(using: .utf8)!, toPeers: mcSession.connectedPeers, with: .reliable)
-            } catch { }
-            
         }
     }
     
@@ -216,3 +229,14 @@ class ViewController: UIViewController, MCSessionDelegate, MCBrowserViewControll
     
 }
 
+extension HomeViewController: MCSessionDelegate {
+    
+}
+
+extension HomeViewController: MCBrowserViewControllerDelegate {
+    
+}
+
+extension HomeViewController: HomePresenterOutput {
+    
+}
