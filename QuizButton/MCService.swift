@@ -10,8 +10,8 @@ import Foundation
 import MultipeerConnectivity
 
 protocol ConnectionServiceProtocol {
-    var model: HomeModelProtocol { get set }
-    func inject(model: HomeModelProtocol)
+    var model: JudgeModelProtocol { get set }
+    func inject(model: JudgeModelProtocol)
     
     var peerId: MCPeerID! { get set }
     var mcSession: MCSession! { get set }
@@ -26,9 +26,9 @@ class MCService: NSObject, ConnectionServiceProtocol {
     let serviceTypeId = "bluemoquiz"
     
     
-    internal var model: HomeModelProtocol
+    internal var model: JudgeModelProtocol
     
-    func inject(model: HomeModelProtocol) {
+    func inject(model: JudgeModelProtocol) {
         self.model = model
     }
     
@@ -80,7 +80,7 @@ extension MCService: MCSessionDelegate {
             message = .youWin
         default: //date
             let date = dateFromString(string: decodedString!, format: dateStringFormat)
-            message = .pushedDate(date)
+            message = .triedDate(date)
         }
         
         model.recievedMessage(message: message)
@@ -100,7 +100,13 @@ extension MCService: MCSessionDelegate {
     
 }
 
-extension MCService: HomeModelConnectionOutput {
+extension MCService: JudgeModelConnectionOutput {
+    
+    var isConnected: Bool {
+        get {
+            return (mcSession.connectedPeers.count == 0)
+        }
+    }
     
     func sendMessage(message: Message) {
         var sendingString: String = ""
@@ -108,7 +114,7 @@ extension MCService: HomeModelConnectionOutput {
         switch message {
         case .youWin:
             sendingString = "youwin"
-        case .pushedDate(let date):
+        case .triedDate(let date):
             sendingString = stringFromDate(date: date, format: dateStringFormat)
         default:
             break

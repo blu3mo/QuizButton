@@ -21,7 +21,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         var presenter = HomePresenter(view: homeViewController)
         var connectionService = MCService()
         
-        var model = HomeModel(presenter: presenter, connectionService: connectionService)
+        var model = JudgeModel(presenter: presenter, connectionService: connectionService)
         
         presenter.inject(model: model)
         connectionService.inject(model: model)

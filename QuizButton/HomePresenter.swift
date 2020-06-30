@@ -18,17 +18,17 @@ protocol HomePresenterOutput: class {
 
 final class HomePresenter: HomePresenterProtocol {
     private weak var view: HomePresenterOutput!
-    private var model: HomeModelProtocol
+    private var model: JudgeModelProtocol
     
     init(view: HomePresenterOutput) {
         self.view = view
     }
     
-    func inject(model: HomeModelProtocol) {
+    func inject(model: JudgeModelProtocol) {
         self.model = model
     }
 }
 
-extension HomePresenter: HomeModelPresenterOutput {
+extension HomePresenter: JudgeModelPresenterOutput {
     
 }
