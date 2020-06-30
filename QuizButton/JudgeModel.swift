@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import MultipeerConnectivity
+import UIKit //本当はしたくない
 
 enum GameResult {
     case won
@@ -26,7 +26,7 @@ enum GameState {
 }
 
 protocol JudgeModelPresenterOutput: class{
-    func changeScreenByResult(result: GameResult)
+    func changeViewByResult(result: GameResult)
 }
 
 protocol JudgeModelConnectionOutput: class{
@@ -34,7 +34,7 @@ protocol JudgeModelConnectionOutput: class{
     
     func sendMessage(message: Message)
     func advertise()
-    func getBrowser() -> MCBrowserViewController
+    func getBrowser() -> UIViewController
 }
 
 protocol JudgeModelProtocol {
@@ -46,15 +46,20 @@ protocol JudgeModelProtocol {
     
     var lastTriedDate: Date { get set }
     
+    func getConnectionBrowser() -> UIViewController
+    func advertise()
+    
     func reactMessage(message: Message)
     func tryAnswering()
+    
+    func resetGame()
 }
 
 
 final class JudgeModel: JudgeModelProtocol {
     
-    weak var presenter: JudgeModelPresenterOutput!
-    weak var connectionService: JudgeModelConnectionOutput!
+    internal weak var presenter: JudgeModelPresenterOutput!
+    internal weak var connectionService: JudgeModelConnectionOutput!
     
     var gameState: GameState
     
@@ -69,25 +74,33 @@ final class JudgeModel: JudgeModelProtocol {
         lastTriedDate = Date(timeIntervalSince1970: 0)
     }
 
+    func getConnectionBrowser() -> UIViewController{
+        return connectionService.getBrowser()
+    }
+    
+    func advertise() {
+        connectionService.advertise()
+    }
+    
     func reactMessage(message: Message) {
         switch message {
         case .youWin:
             if gameState != .done {
                 gameState = .done
-                presenter.changeScreenByResult(result: .won)
+                presenter.changeViewByResult(result: .won)
             }
         case .triedDate(let opponentDate):
             
             switch gameState {
             case .open: //clearly lost the game
-                presenter.changeScreenByResult(result: .lost)
+                presenter.changeViewByResult(result: .lost)
                 gameState = .done
                 connectionService.sendMessage(message: .youWin)
             case .waiting: //comparing date
                 if opponentDate < lastTriedDate {
-                    presenter.changeScreenByResult(result: .lost)
+                    presenter.changeViewByResult(result: .lost)
                 } else {
-                    presenter.changeScreenByResult(result: .won)
+                    presenter.changeViewByResult(result: .won)
                 }
                 gameState = .done
             case .done:
@@ -111,6 +124,10 @@ final class JudgeModel: JudgeModelProtocol {
         default:
             break
         }
+    }
+    
+    func resetGame() {
+        gameState = .open
     }
     
 }

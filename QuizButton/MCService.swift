@@ -83,7 +83,7 @@ extension MCService: MCSessionDelegate {
             message = .triedDate(date)
         }
         
-        model.recievedMessage(message: message)
+        model.reactMessage(message: message)
     }
     
     func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
