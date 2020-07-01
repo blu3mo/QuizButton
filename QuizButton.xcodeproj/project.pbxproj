@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3680B22924ACD9DD00C62592 /* HomePresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3680B22824ACD9DD00C62592 /* HomePresenterTests.swift */; };
 		368CF9F122677B5C009D4947 /* quizsound.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 368CF9F0226779E8009D4947 /* quizsound.m4a */; };
 		3695153E24A8721D00D3E38C /* HomePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3695153D24A8721D00D3E38C /* HomePresenter.swift */; };
 		3695154024A8723B00D3E38C /* JudgeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3695153F24A8723B00D3E38C /* JudgeModel.swift */; };
@@ -39,7 +38,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		3680B22824ACD9DD00C62592 /* HomePresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePresenterTests.swift; sourceTree = "<group>"; };
 		368CF9F0226779E8009D4947 /* quizsound.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = quizsound.m4a; sourceTree = "<group>"; };
 		3695153D24A8721D00D3E38C /* HomePresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePresenter.swift; sourceTree = "<group>"; };
 		3695153F24A8723B00D3E38C /* JudgeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JudgeModel.swift; sourceTree = "<group>"; };
@@ -124,7 +122,6 @@
 			isa = PBXGroup;
 			children = (
 				36CF3DB92265E169001DB43D /* QuizButtonTests.swift */,
-				3680B22824ACD9DD00C62592 /* HomePresenterTests.swift */,
 				36CF3DBB2265E169001DB43D /* Info.plist */,
 			);
 			path = QuizButtonTests;
@@ -285,7 +282,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				36CF3DBA2265E169001DB43D /* QuizButtonTests.swift in Sources */,
-				3680B22924ACD9DD00C62592 /* HomePresenterTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
