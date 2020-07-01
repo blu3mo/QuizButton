@@ -16,12 +16,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        var homeViewController = UIStoryboard(name: "Home", bundle: nil).instantiateInitialViewController() as! HomeViewController
+        let homeViewController = UIStoryboard(name: "Home", bundle: nil).instantiateInitialViewController() as! HomeViewController
         
-        var presenter = HomePresenter(view: homeViewController)
-        var connectionService = MCService()
+        let presenter = HomePresenter(view: homeViewController)
+        let connectionService = MCService()
         
-        var model = JudgeModel(presenter: presenter, connectionService: connectionService)
+        let model = JudgeModel(presenter: presenter, connectionService: connectionService)
         
         presenter.inject(model: model)
         connectionService.inject(model: model)

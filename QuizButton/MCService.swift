@@ -10,7 +10,7 @@ import Foundation
 import MultipeerConnectivity
 
 protocol ConnectionServiceProtocol {
-    var model: JudgeModelProtocol { get set }
+    var model: JudgeModelProtocol! { get set }
     func inject(model: JudgeModelProtocol)
     
     var peerId: MCPeerID! { get set }
@@ -26,13 +26,15 @@ class MCService: NSObject, ConnectionServiceProtocol {
     let serviceTypeId = "bluemoquiz"
     
     
-    internal var model: JudgeModelProtocol
+    internal var model: JudgeModelProtocol!
     
     func inject(model: JudgeModelProtocol) {
         self.model = model
     }
     
     override init() {
+        super.init()
+        
         peerId = MCPeerID(displayName: UIDevice.current.name)
         mcSession = MCSession(peer: peerId, securityIdentity: nil, encryptionPreference: .required)
         mcSession.delegate = self
@@ -116,8 +118,6 @@ extension MCService: JudgeModelConnectionOutput {
             sendingString = "youwin"
         case .triedDate(let date):
             sendingString = stringFromDate(date: date, format: dateStringFormat)
-        default:
-            break
         }
             
         do {
@@ -132,7 +132,7 @@ extension MCService: JudgeModelConnectionOutput {
         mcAdvertiserAssistant.start()
     }
     
-    func getBrowser() -> MCBrowserViewController {
+    func getBrowser() -> UIViewController {
         let mcBrowser = MCBrowserViewController(serviceType: serviceTypeId, session: mcSession)
         mcBrowser.delegate = self
         mcBrowser.maximumNumberOfPeers = 1
