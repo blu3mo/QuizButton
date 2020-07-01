@@ -13,9 +13,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
         let homeViewController = UIStoryboard(name: "Home", bundle: nil).instantiateInitialViewController() as! HomeViewController
         
         let presenter = HomePresenter(view: homeViewController)
@@ -26,6 +26,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         presenter.inject(model: model)
         connectionService.inject(model: model)
         homeViewController.inject(presenter: presenter)
+        
+        window = UIWindow(frame: UIScreen.main.bounds)
+        window?.rootViewController = homeViewController
+        window?.makeKeyAndVisible()
         
         return true
     }
